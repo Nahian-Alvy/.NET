@@ -14,7 +14,7 @@ namespace labtaskk2.Models
 
         [Required(ErrorMessage = "Please provide Id")]
         [RegularExpression(@"^\d{2}-\d{5}-\d{1}$", ErrorMessage = "Id must follow the pattern XX-XXXXX-X (where X is a digit).")]
-        public int Id { get; set; }
+        public string Id { get; set; }
         [Required]
         [RegularExpression(@"^[A-Za-z .-]+$", ErrorMessage = "Name must only contain alphabets, dots, dashes, and spaces.")]
         public string Name { get; set; }
@@ -24,7 +24,7 @@ namespace labtaskk2.Models
 
         [Required]
         [CustomAgeValidation(ErrorMessage = "You must be over 18 years old.")]
-        public string Dob { get; set; }
+        public DateTime Dob { get; set; }
     }
     public class CustomAgeValidationAttribute : ValidationAttribute
     {
@@ -47,5 +47,38 @@ namespace labtaskk2.Models
 
         }
     }
-  
+    public class CustomEmailValidationAttribute : ValidationAttribute
+    {
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            
+            if (value == null || !(value is string email))
+            {
+                return new ValidationResult("Invalid email format.");
+            }
+
+            
+            var student = (Student)validationContext.ObjectInstance;
+
+           
+            var id = student.Id.ToString();
+
+            var expectedEmail = "@student.aiub.edu";
+
+
+            if (email.StartsWith(id)&&email.EndsWith(expectedEmail))
+            {
+                if (email.Length == id.Length + expectedEmail.Length)
+                {
+                    return ValidationResult.Success;
+                }
+                
+            }
+            
+            
+            return new ValidationResult(ErrorMessage);
+            
+        }
+    }
+
 }
